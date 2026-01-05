@@ -10,16 +10,17 @@
 
         function loadPicker() {
     gapi.load('picker', { 'callback': () => {
-        // Create a single view that handles everything
-        const folderView = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
-            .setIncludeFolders(true)      // Show folders
-            .setSelectFolderEnabled(true) // Allow picking the folder
-            .setEnableDrives(true)        // Show Shared Drives
-            .setParent('root');           // Explicitly set the starting point to 'My Drive'
+        // We use the base DocsView but FILTER it to only show folders.
+        // This is the most compatible way to use the drive.file scope.
+        const view = new google.picker.DocsView(google.picker.ViewId.DOCS)
+            .setIncludeFolders(true) 
+            .setSelectFolderEnabled(true)
+            .setMimeTypes('application/vnd.google-apps.folder') // Only show folders
+            .setEnableDrives(true); // Allow Shared Drives navigation
 
         const picker = new google.picker.PickerBuilder()
-            .setTitle("Select Google Drive Folder")
-            .addView(folderView)
+            .setTitle("Select a Folder")
+            .addView(view) 
             .setOAuthToken(token)
             .setDeveloperKey(devKey)
             .setOrigin(window.location.origin)
