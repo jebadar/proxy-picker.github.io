@@ -3,18 +3,22 @@
 <head>
     <script src="https://apis.google.com/js/api.js"></script>
     <script>
-        // 1. Get token from the URL (passed by your extension)
+        // Get token from URL
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
-        const devKey = 'AIzaSy...'; // Your Developer Key
+        const devKey = 'AIzaSyAAFDzSHl05ry2YRXTYnsjMn83G31yji-4'; // Your actual key
 
         function loadPicker() {
             gapi.load('picker', { 'callback': () => {
                 const picker = new google.picker.PickerBuilder()
-                    .addView(google.picker.ViewId.DOCS)
+                    .addView(google.picker.ViewId.FOLDERS)
+                    .addView(new google.picker.DocsView(google.picker.ViewId.DOCS)
+                        .setParent('root')
+                        .setIncludeFolders(true)
+                        .setSelectFolderEnabled(true))
                     .setOAuthToken(token)
                     .setDeveloperKey(devKey)
-                    .setOrigin('https://yourdomain.com') // MATCHES THE HOSTED DOMAIN
+                    .setOrigin('https://jebadar.github.io') // YOUR ACTUAL DOMAIN
                     .setCallback(pickerCallback)
                     .build();
                 picker.setVisible(true);
@@ -23,10 +27,14 @@
 
         function pickerCallback(data) {
             if (data.action === google.picker.Action.PICKED) {
-                // 2. Send the result back to the Extension window
                 window.opener.postMessage({
                     type: 'PICKER_RESULT',
                     doc: data.docs[0]
+                }, '*');
+                window.close();
+            } else if (data.action === google.picker.Action.CANCEL) {
+                window.opener.postMessage({
+                    type: 'PICKER_CANCELLED'
                 }, '*');
                 window.close();
             }
