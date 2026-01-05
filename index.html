@@ -9,21 +9,19 @@
         const devKey = 'AIzaSyAAFDzSHl05ry2YRXTYnsjMn83G31yji-4'; // Your actual key
 
         function loadPicker() {
-            gapi.load('picker', { 'callback': () => {
-                const picker = new google.picker.PickerBuilder()
-                    // DocsView allows the user to browse their drive to select a file/folder
-                    // even if the app hasn't seen it yet.
-                    .addView(new google.picker.DocsView()
-                        .setIncludeFolders(true) 
-                        .setSelectFolderEnabled(true))
-                    .setOAuthToken(token)
-                    .setDeveloperKey(devKey)
-                    .setOrigin('https://jebadar.github.io')
-                    .setCallback(pickerCallback)
-                    .build();
-                picker.setVisible(true);
-            }});
-        }
+            console.log("window.location.origin",window.location.origin)
+    gapi.load('picker', { 'callback': () => {
+        const picker = new google.picker.PickerBuilder()
+            .addView(google.picker.ViewId.FOLDERS)
+            .setOAuthToken(token)
+            .setDeveloperKey(devKey)
+            // Use window.location.origin to ensure it matches exactly what the browser sees
+            .setOrigin(window.location.origin) 
+            .setCallback(pickerCallback)
+            .build();
+        picker.setVisible(true);
+    }});
+}
 
         function pickerCallback(data) {
             if (data.action === google.picker.Action.PICKED) {
