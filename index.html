@@ -36,19 +36,15 @@
             if (data.action === google.picker.Action.PICKED) {
                 const doc = data.docs[0];
                 
-                // Use window.postMessage to "scream" the result to the page
-                // The Content Script will be listening for this.
                 window.postMessage({
-                    source: 'DRIVE_PICKER_PAGE', // Unique ID to identify your message
+                    source: 'DRIVE_PICKER_PAGE',
                     type: 'PICKER_RESULT',
                     folderId: doc.id,
                     folderName: doc.name,
-                    driveId: doc.driveId || null
+                    // Even if driveId is missing, we flag it as a potential shared item
+                    isShared: doc.isShared || false 
                 }, "*"); 
         
-                console.log("Message posted to window");
-                
-                // Optional: Wait a tiny bit before closing to ensure the script catches it
                 setTimeout(() => window.close(), 500);
             }
         }
