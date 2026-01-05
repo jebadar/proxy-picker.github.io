@@ -11,14 +11,14 @@
         function loadPicker() {
             gapi.load('picker', { 'callback': () => {
                 const picker = new google.picker.PickerBuilder()
-                    .addView(google.picker.ViewId.FOLDERS)
-                    .addView(new google.picker.DocsView(google.picker.ViewId.DOCS)
-                        .setParent('root')
-                        .setIncludeFolders(true)
+                    // DocsView allows the user to browse their drive to select a file/folder
+                    // even if the app hasn't seen it yet.
+                    .addView(new google.picker.DocsView()
+                        .setIncludeFolders(true) 
                         .setSelectFolderEnabled(true))
                     .setOAuthToken(token)
                     .setDeveloperKey(devKey)
-                    .setOrigin('https://jebadar.github.io') // YOUR ACTUAL DOMAIN
+                    .setOrigin('https://jebadar.github.io')
                     .setCallback(pickerCallback)
                     .build();
                 picker.setVisible(true);
