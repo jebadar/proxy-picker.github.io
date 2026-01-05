@@ -9,14 +9,20 @@
         const devKey = 'AIzaSyAAFDzSHl05ry2YRXTYnsjMn83G31yji-4'; // Your actual key
 
                 function loadPicker() {
-            console.log("window.location.origin",window.location.origin)
     gapi.load('picker', { 'callback': () => {
+        // Create a single view that handles everything
+        const folderView = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+            .setIncludeFolders(true)      // Show folders
+            .setSelectFolderEnabled(true) // Allow picking the folder
+            .setEnableDrives(true)        // Show Shared Drives
+            .setParent('root');           // Explicitly set the starting point to 'My Drive'
+
         const picker = new google.picker.PickerBuilder()
-            .addView(google.picker.ViewId.FOLDERS)
+            .setTitle("Select Google Drive Folder")
+            .addView(folderView)
             .setOAuthToken(token)
             .setDeveloperKey(devKey)
-            // Use window.location.origin to ensure it matches exactly what the browser sees
-            .setOrigin(window.location.origin) 
+            .setOrigin(window.location.origin)
             .setCallback(pickerCallback)
             .build();
         picker.setVisible(true);
