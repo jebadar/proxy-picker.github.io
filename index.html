@@ -10,15 +10,24 @@
 
         function loadPicker() {
     gapi.load('picker', { 'callback': () => {
-        // 1. Create a View specifically for Folders
+        // 1. Create the standard My Drive view
+        const driveView = new google.picker.DocsView(google.picker.ViewId.DOCS)
+            .setIncludeFolders(true)
+            .setSelectFolderEnabled(true)
+            .setEnableDrives(true); // Enables the Shared Drives tab in the sidebar
+
+        // 2. Create a specific Folders-only view (optional, but helps with UX)
         const folderView = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
-            .setSelectFolderEnabled(true) // Allows picking the folder itself
-            .setIncludeFolders(true)      // Shows folders in the list
-            .setEnableDrives(true);       // CRITICAL: Shows Shared Drives
+            .setIncludeFolders(true)
+            .setSelectFolderEnabled(true)
+            .setEnableDrives(true);
 
         const picker = new google.picker.PickerBuilder()
-            .setTitle("Select a Destination Folder")
-            .addView(folderView)          // Use our custom folder view
+            .setTitle("Select a Folder from My Drive or Shared Drives")
+            // Adding both views ensures the "My Drive" and "Shared Drives" 
+            // options appear in the sidebar navigation
+            .addView(driveView)
+            .addView(folderView) 
             .setOAuthToken(token)
             .setDeveloperKey(devKey)
             .setOrigin(window.location.origin)
