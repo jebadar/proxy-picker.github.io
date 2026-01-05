@@ -9,33 +9,26 @@
         const devKey = 'AIzaSyAAFDzSHl05ry2YRXTYnsjMn83G31yji-4'; // Your actual key
 
                 function loadPicker() {
-    gapi.load('picker', { 'callback': () => {
-        // 1. Create the standard My Drive view
-        const driveView = new google.picker.DocsView(google.picker.ViewId.DOCS)
-            .setIncludeFolders(true)
-            .setSelectFolderEnabled(true)
-            .setEnableDrives(true); // Enables the Shared Drives tab in the sidebar
-
-        // 2. Create a specific Folders-only view (optional, but helps with UX)
-        const folderView = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
-            .setIncludeFolders(true)
-            .setSelectFolderEnabled(true)
-            .setEnableDrives(true);
-
-        const picker = new google.picker.PickerBuilder()
-            .setTitle("Select a Folder from My Drive or Shared Drives")
-            // Adding both views ensures the "My Drive" and "Shared Drives" 
-            // options appear in the sidebar navigation
-            .addView(driveView)
-            .addView(folderView) 
-            .setOAuthToken(token)
-            .setDeveloperKey(devKey)
-            .setOrigin(window.location.origin)
-            .setCallback(pickerCallback)
-            .build();
-        picker.setVisible(true);
-    }});
-}
+                    gapi.load('picker', { 'callback': () => {
+                        // We create just ONE view. 
+                        // DocsView(google.picker.ViewId.DOCS) is the most flexible base.
+                        const view = new google.picker.DocsView(google.picker.ViewId.DOCS)
+                            .setIncludeFolders(true)      // Show folders
+                            .setSelectFolderEnabled(true) // Allow picking the folders
+                            .setEnableDrives(true);       // This adds "Shared Drives" to the LEFT sidebar
+                
+                        const picker = new google.picker.PickerBuilder()
+                            .setTitle("Select Destination Folder")
+                            // Use only the one view to avoid redundant top tabs
+                            .addView(view)
+                            .setOAuthToken(token)
+                            .setDeveloperKey(devKey)
+                            .setOrigin(window.location.origin)
+                            .setCallback(pickerCallback)
+                            .build();
+                        picker.setVisible(true);
+                    }});
+                }
 
         function pickerCallback(data) {
             if (data.action === google.picker.Action.PICKED) {
