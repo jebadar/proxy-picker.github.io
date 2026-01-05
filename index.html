@@ -32,18 +32,24 @@
                     }});
                 }
 
-        function pickerCallback(data) {
+       function pickerCallback(data) {
             if (data.action === google.picker.Action.PICKED) {
-                window.opener.postMessage({
+                const doc = data.docs[0];
+                
+                // Use window.postMessage to "scream" the result to the page
+                // The Content Script will be listening for this.
+                window.postMessage({
+                    source: 'DRIVE_PICKER_PAGE', // Unique ID to identify your message
                     type: 'PICKER_RESULT',
-                    doc: data.docs[0]
-                }, '*');
-                window.close();
-            } else if (data.action === google.picker.Action.CANCEL) {
-                window.opener.postMessage({
-                    type: 'PICKER_CANCELLED'
-                }, '*');
-                window.close();
+                    folderId: doc.id,
+                    folderName: doc.name,
+                    driveId: doc.driveId || null
+                }, "*"); 
+        
+                console.log("Message posted to window");
+                
+                // Optional: Wait a tiny bit before closing to ensure the script catches it
+                setTimeout(() => window.close(), 500);
             }
         }
         window.onload = loadPicker;
