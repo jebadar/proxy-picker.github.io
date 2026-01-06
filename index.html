@@ -53,14 +53,19 @@
     </style>
     <script src="https://apis.google.com/js/api.js"></script>
     <script>
-        // Get token from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const devKey = 'AIzaSyAAFDzSHl05ry2YRXTYnsjMn83G31yji-4'; // Your actual key
+// Get both token and key from URL
+const urlParams = new URLSearchParams(window.location.search);
+const token = urlParams.get('token');
+const devKey = urlParams.get('key'); // Read the key dynamically
 
-                function loadPicker() {
-                    gapi.load('picker', { 'callback': () => {
-                        // 1. Create a single view for folders. 
+function loadPicker() {
+    if (!devKey || !token) {
+        console.error("Missing credentials in URL");
+        return;
+    }
+    
+    gapi.load('picker', { 'callback': () => {
+         // 1. Create a single view for folders. 
                         // We do NOT call setEnableDrives(true) here because that often 
                         // forces the view to show ONLY Shared Drives.
                         const view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
@@ -79,8 +84,38 @@
                             .build();
                             
                         picker.setVisible(true);
-                    }});
-                }
+        
+        // Hide the loading spinner
+        setTimeout(() => {
+            document.getElementById('loader-container').classList.add('hidden');
+        }, 300);
+    }});
+}
+
+        
+                // function loadPicker() {
+                //     gapi.load('picker', { 'callback': () => {
+                //         // 1. Create a single view for folders. 
+                //         // We do NOT call setEnableDrives(true) here because that often 
+                //         // forces the view to show ONLY Shared Drives.
+                //         const view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+                //             .setIncludeFolders(true)
+                //             .setSelectFolderEnabled(true);
+                
+                //         const picker = new google.picker.PickerBuilder()
+                //             .setTitle("Select a Folder")
+                //             .addView(view)
+                //             // 2. CRITICAL: Enable the sidebar navigation for all drive types
+                //             .enableFeature(google.picker.Feature.SUPPORT_DRIVES) 
+                //             .setOAuthToken(token)
+                //             .setDeveloperKey(devKey)
+                //             .setOrigin(window.location.origin)
+                //             .setCallback(pickerCallback)
+                //             .build();
+                            
+                //         picker.setVisible(true);
+                //     }});
+                // }
 
        function pickerCallback(data) {
             if (data.action === google.picker.Action.PICKED) {
@@ -104,7 +139,7 @@
 <body>
     <div id="loader-container">
         <div class="spinner"></div>
-        <div class="loading-text">Connecting to Google Drive...</div>
+        <div class="loading-text">Authenticating with Google Drive...</div>
     </div>
 </body>
 </html>
